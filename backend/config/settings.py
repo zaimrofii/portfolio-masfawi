@@ -128,10 +128,13 @@ MAILERS = {
 INSTALLED_APPS += ["rest_framework", "corsheaders", "pesanan"]
 MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
 CORS_ALLOW_ALL_ORIGINS = True  # dev only; produksi: batasi
-ALLOWED_HOSTS = ["*"]  # dev only
 
 import os
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = [
+    'portfolio-masfawi-production.up.railway.app',
+    'localhost',
+    '127.0.0.1',
+]
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
