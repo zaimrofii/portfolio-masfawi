@@ -135,7 +135,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
 ]
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get("https://portfolio-masfawi.vercel.app", "CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
