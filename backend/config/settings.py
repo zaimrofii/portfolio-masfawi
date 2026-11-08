@@ -71,10 +71,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-import dj_database_url
+import os
 
 DATABASES = {
-    "default": dj_database_url.config(default="sqlite:///db.sqlite3")
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.environ.get("DATABASE_PATH", "/app/data/db.sqlite3"),
+    }
 }
 
 
@@ -135,7 +138,11 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
 ]
-CORS_ALLOWED_ORIGINS = os.environ.get("https://portfolio-masfawi.vercel.app", "CORS_ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    "CORS_ALLOWED_ORIGINS",
+    "https://portfolio-masfawi.vercel.app,http://localhost:5173"
+).split(",")
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
