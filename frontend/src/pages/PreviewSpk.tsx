@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Button, EmptyState } from "@/components/ui";
 import { usePesananDetail } from "@/hooks/usePesananDetail";
-import { formatRupiah, formatTanggal } from "@/lib/format";
+import { formatTanggal } from "@/lib/format";
 import { resolveSpk } from "@/lib/resolveSpk";
 import { ATURAN_PRODUKSI, PERINGATAN_SPK } from "@/lib/spkAturan";
 
@@ -104,25 +104,10 @@ export function PreviewSpk() {
 
   const { item, desain } = terurai;
 
-  const kategoriUnik = [
-    ...new Set(item.varian.map((baris) => baris.kategori)),
-  ].sort((a, b) => (a === b ? 0 : a === "DEWASA" ? -1 : 1));
-  const tampilKategori = kategoriUnik.length > 1;
-
-  const jumlahSel = (kategori: "DEWASA" | "ANAK", ukuran: string) =>
-    item.varian
-      .filter((baris) => baris.kategori === kategori && baris.ukuran === ukuran)
-      .reduce((total, baris) => total + baris.jumlah, 0);
-
   const totalPcs = item.varian.reduce(
     (total, baris) => total + baris.jumlah,
     0,
   );
-  const totalRupiah = item.varian.reduce(
-    (total, baris) => total + baris.subtotal,
-    0,
-  );
-
   const spesifikasiOtomatis: { label: string; nilai: string }[] = [
     {
       label: "Item",
