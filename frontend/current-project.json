@@ -1,0 +1,116 @@
+{
+  "name": "penjahit-frontend",
+  "phase": "8.5-done",
+  "phase_label": "Modul Invoice (pembayaran + print A4 portrait)",
+  "next_phase": "9 — Demo klien (matikan Vercel Protection, alur end-to-end)",
+  "last_updated": "2026-11-17T19:04:37Z",
+  "stack": "vite+react+ts+tailwindv4+router+tq+axios+rhf+zod+msw",
+  "tauri_ready": true,
+  "api_base_env": "VITE_API_BASE_URL",
+  "mock": "msw (fase 1 aktif)",
+  "styles": {
+    "file": "src/styles/index.css",
+    "bytes": 7943,
+    "sha256": "1327aaa09a6bfcdf4d1f04e98f8724a8f77a0aedf69024e4e776997781ae4f96"
+  },
+  "contract": {
+    "pesanan": "id, nomor, customer, status, deadline, catatan, designer?, status_bayar, dibayar, metode_bayar?, catatan_bayar?, total_harga, items[], spk[], log[], kendala?[], created_at, updated_at",
+    "item": "id, pesanan_id, jenis, kain, lengan, warna, saku, varian[], desain[], spesifikasi?[]",
+    "desain": "label_desain, jenis_spk, gambar_depan/belakang/desain, bordir_titik, bordir_keterangan, spesifikasi[]",
+    "spk": "VIEW turunan: id, nomor_spk, nomor_urut, item_id, desain_index, label_desain?, jenis_spk?",
+    "payload": "PesananCreate { customer_id, deadline, catatan, designer?, items[].varian[] + desain[] + spesifikasi? }"
+  },
+  "pages": {
+    "done": [
+      "/ (Dashboard)",
+      "/pesanan/baru (wizard 3 langkah)",
+      "/pesanan (Daftar)",
+      "/pesanan/:id (Detail + kartu SPK)",
+      "/pesanan/:id/edit",
+      "/antrian",
+      "/pesanan/:id/spk/:spk_id (Preview SPK A1–D3, print)",
+      "/master/kain (Master Kain)",
+      "/master/customer (Master Customer)",
+      "/arsip (Arsip read-only)",
+      "/pesanan/:id/invoice (Invoice + print)"
+    ],
+    "placeholder": []
+  },
+  "features": {
+    "wizard": "Step 1 customer+designer+deadline; Step 2 item+desain (visual+bordir); Step 3 varian+spesifikasi item+close-up+spesifikasi desain",
+    "varian_per_item": "varian[] milik ItemPesanan (sumber pcs & total)",
+    "spk_view_turunan": "1 SPK = 1 desain pada 1 item (item_id + desain_index), dibaca via resolveSpk()",
+    "spk_per_desain": "nomor <pesanan>-<urut>; jumlah SPK = jumlah desain",
+    "upload_gambar": "base64 data URL via kompresGambar (canvas, max 1200px, q=0.8, max 5 MB)",
+    "spesifikasi_bebas": "manual per desain + per item; Preview SPK menampilkan otomatis + manual",
+    "spk_preview": "layout A1–D3 (A4 portrait), window.print() + print.css",
+    "spk_export": "window.print() (Tauri-ready); backend PDF menyusul",
+    "antrian": "1 produksi aktif + list DISETUJUI; POST /antrian/mulai-berikutnya/",
+    "status_flow": "8 status, transisi via ConfirmDialog, log status",
+    "kendala": "catat kendala per pesanan",
+    "master_kain": "CRUD inline, nonaktifkan bukan hapus, form inline di atas tabel",
+    "master_customer": "CRUD inline + search debounce + kolom Jumlah Pesanan dihitung klien",
+    "arsip": "read-only DIAMBIL/BATAL, filter bulan di klien",
+    "invoice": "card pembayaran di Detail + halaman invoice A4 portrait + window.print(); status BELUM_BAYAR/DP/LUNAS"
+  },
+  "api_layer": {
+    "files": [
+      "client.ts",
+      "types.ts",
+      "pesanan.ts",
+      "customer.ts",
+      "kain.ts",
+      "dashboard.ts",
+      "antrian.ts",
+      "backup.ts",
+      "pesanan.ts (catatPembayaran)"
+    ],
+    "hooks": [
+      "usePesananList",
+      "usePesananDetail",
+      "useUbahStatus",
+      "useCatatKendala",
+      "useAntrian",
+      "useDashboard",
+      "useCustomerList (+useBuatCustomer)",
+      "useKainList",
+      "useBuatPesanan",
+      "useUpdatePesanan",
+      "useMulaiBerikutnya",
+      "useBuatKain",
+      "useUpdateKain",
+      "useUpdateCustomer",
+      "useCatatPembayaran"
+    ],
+    "catatan": "signature hook tidak berubah; PesananCreate: varian pindah ke item, spk[] hanya dibaca"
+  },
+  "deviations_from_blueprint": [
+    "varian[] kembali ke ItemPesanan; SpkProduksi = view turunan tanpa varian/gambar/spesifikasi",
+    "gambar close-up & spesifikasi manual desain diisi di Step 3",
+    "export_spk di STATUS_MAP dipertahankan (id), label UI Lihat SPK",
+    "harga_satuan varian string di form (kosong = nego), number di payload",
+    "Kendala.pesanan_nomor opsional",
+    "Table punya render?/emptyText; Badge menerima emerald",
+    "Invoice: pembayaran parsial (BELUM_BAYAR/DP/LUNAS); sebelumnya cetak biru hanya export_invoice"
+  ],
+  "django_notes_untuk_backend": {
+    "SpkProduksi": "tidak perlu model — generate di GET /pesanan/:id/spk/ dari items[].desain[]",
+    "VarianUkuran": "FK ke ItemPesanan (kembali)",
+    "ItemPesanan": "punya varian[] + desain[] + spesifikasi?",
+    "DesainItem": "model baru/JSONField: label_desain, jenis_spk, gambar_*, bordir_titik, bordir_keterangan, spesifikasi",
+    "Pesanan.designer": "CharField(max_length=100, blank=True)",
+    "generate_spk": "turunan: 1 desain -> 1 SPK; nomor <pesanan.nomor>-<urut>; desain_index",
+    "spk_endpoint": "GET /api/pesanan/:id/spk/ dan GET /api/pesanan/:id/spk/:spk_id/",
+    "Pesanan.status_bayar": "CharField(choices=BELUM_BAYAR/DP/LUNAS, default=BELUM_BAYAR)",
+    "Pesanan.dibayar": "DecimalField(default=0)",
+    "Pesanan.metode_bayar": "CharField(blank=True)",
+    "Pesanan.catatan_bayar": "TextField(blank=True)",
+    "PATCH /pesanan/:id/bayar/": "update dibayar & status_bayar; tolak nominal<=0 atau dibayar>total"
+  },
+  "tech_debt": [
+    "gambar base64 = sementara, ganti ImageField/URL saat backend",
+    "PDF SPK/invoice belum ada (mock 404)",
+    "logo A1 masih fallback teks NAMA USAHA",
+    "SpkProduksi masih disimpan di mock — backend nanti generate on-the-fly"
+  ]
+}

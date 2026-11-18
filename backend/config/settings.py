@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n@p%*66oxzcgu_7%k@d0fk!o$o07vh__^p495g*%oc3zla-r3o'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False   
 
 ALLOWED_HOSTS = []
 
@@ -131,9 +133,8 @@ MAILERS = {
 
 INSTALLED_APPS += ["rest_framework", "corsheaders", "pesanan"]
 MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
-CORS_ALLOW_ALL_ORIGINS = True  # dev only; produksi: batasi
+CORS_ALLOW_ALL_ORIGINS = False    # dev only; produksi: batasi
 
-import os
 ALLOWED_HOSTS = [
     'portfolio-masfawi-production.up.railway.app',
     'localhost',

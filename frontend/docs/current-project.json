@@ -1,0 +1,94 @@
+{
+  "name": "penjahit-frontend",
+  "phase": "7.2-done",
+  "phase_label": "Perbaikan struktural: varian per item, SPK view turunan, close-up pindah Step 3",
+  "next_phase": "7 — Master Kain + Master Customer",
+  "last_updated": "2026-11-17T14:12:18Z",
+  "stack": "vite+react+ts+tailwindv4+router+tq+axios+rhf+zod+msw",
+  "tauri_ready": true,
+  "api_base_env": "VITE_API_BASE_URL",
+  "mock": "msw (fase 1 aktif)",
+  "styles": {
+    "file": "src/styles/index.css",
+    "bytes": 7943,
+    "sha256": "1327aaa09a6bfcdf4d1f04e98f8724a8f77a0aedf69024e4e776997781ae4f96"
+  },
+  "contract": {
+    "pesanan": "id, nomor, customer, status, deadline, catatan, designer?, total_harga, items[], spk[], log[], kendala?[], created_at, updated_at",
+    "spk": "VIEW TURUNAN (bukan disimpan): { id, nomor_spk, nomor_urut, item_id, desain_index, label_desain?, jenis_spk? }. Varian/gambar/spesifikasi/bordir dibaca dari item.desain[desain_index].",
+    "item": "spesifikasi dasar baju + varian[] (sumber pcs) + desain[] (daftar desain: label, jenis_spk, gambar_depan/belakang/desain, bordir, spesifikasi[])",
+    "payload": "PesananCreate { customer_id, deadline, catatan, designer?, items[].{ jenis, kain_id, lengan, warna, saku, varian[], spesifikasi?, desain[] } }"
+  },
+  "pages": {
+    "done": [
+      "/ (Dashboard)",
+      "/pesanan/baru (wizard 3 langkah)",
+      "/pesanan (Daftar)",
+      "/pesanan/:id (Detail + kartu SPK)",
+      "/pesanan/:id/edit",
+      "/antrian",
+      "/pesanan/:id/spk/:spk_id (Preview SPK A1–D3, print)"
+    ],
+    "placeholder": ["/arsip", "/master/kain", "/master/customer"]
+  },
+  "features": {
+    "wizard": "Step 1 customer+designer+deadline; Step 2 item+desain+upload; Step 3 varian+spesifikasi",
+    "spk_per_desain": "1 SPK = 1 unit produksi (item x desain); nomor <pesanan>-<urut>",
+    "upload_gambar": "base64 data URL via kompresGambar (canvas, max 1200px, q=0.8, max 5 MB)",
+    "spesifikasi_bebas": "array {label,nilai} free-form di kolom C SPK",
+    "antrian": "1 produksi aktif + list DISETUJUI; POST /antrian/mulai-berikutnya/",
+    "status_flow": "8 status, transisi via ConfirmDialog, log status",
+    "kendala": "catat kendala per pesanan (SDM/MESIN/BAHAN/LAINNYA + estimasi mundur)",
+    "spk_preview": "layout A1–D3, print-to-PDF via window.print() + print.css A4 PORTRAIT",
+    "spk_export": "window.print() (Tauri-ready); backend PDF menyusul"
+  },
+  "api_layer": {
+    "files": [
+      "client.ts",
+      "types.ts",
+      "pesanan.ts",
+      "customer.ts",
+      "kain.ts",
+      "dashboard.ts",
+      "antrian.ts",
+      "backup.ts"
+    ],
+    "hooks": [
+      "usePesananList",
+      "usePesananDetail",
+      "useUbahStatus",
+      "useCatatKendala",
+      "useAntrian",
+      "useDashboard",
+      "useCustomerList (+useBuatCustomer)",
+      "useKainList",
+      "useBuatPesanan",
+      "useUpdatePesanan",
+      "useMulaiBerikutnya"
+    ],
+    "catatan": "useBuatPesanan/useUpdatePesanan tidak berubah signature; payload berubah ke items[].desain[]"
+  },
+  "deviations_from_blueprint": [
+    "Widget Daftar SPK belum ada - SPK tampil sebagai kartu di Detail; halaman daftar menyusul Fase 7.1",
+    "export_spk di STATUS_MAP dipertahankan (id) tetapi label UI jadi Preview Semua SPK -> membuka preview SPK pertama",
+    "harga_satuan varian disimpan string di form (kosong = nego), number di payload",
+    "Kendala.pesanan_nomor opsional (dilengkapi handler dashboard)",
+    "Table punya render?/emptyText; Badge menerima warna emerald"
+  ],
+  "django_notes_untuk_backend": {
+    "SpkProduksi": "TIDAK perlu model. Generate on-the-fly di GET /api/pesanan/:id/spk/ dan GET /api/pesanan/:id/spk/:spk_id/ dari items[].desain[].",
+    "ItemPesanan": "punya varian[] (FK balik ke ItemPesanan) + desain[] (bisa model `DesainItem` FK atau JSONField)",
+    "DesainItem": "label_desain, jenis_spk, gambar_depan (ImageField), gambar_belakang, gambar_desain, bordir_titik (PositiveIntegerField null), bordir_keterangan, spesifikasi (JSONField)",
+    "VarianUkuran": "FK ke ItemPesanan (bukan SpkProduksi)",
+    "Pesanan.designer": "CharField(max_length=100, blank=True)",
+    "generate_spk": "saat GET /spk/ — items × desain = N SPK; nomor `${pesanan.nomor}-${urut}`",
+    "spesifikasi_otomatis": "BUKAN field DB — dihitung di serializer dari item + desain (item, lengan, saku, jenis_spk, bordir, label_desain)"
+  },
+  "tech_debt": [
+    "gambar base64 = sementara, ganti ImageField/URL saat backend",
+    "halaman Arsip/Master Kain/Master Customer masih placeholder",
+    "bundle JS >500 kB (lucide + RHF + zod) - pertimbangkan code-splitting",
+    "logo A1 masih fallback teks NAMA USAHA (public/logo.png opsional)",
+    "SpkProduksi masih disimpan di mock sebagai field — backend nanti generate on-the-fly"
+  ]
+}
