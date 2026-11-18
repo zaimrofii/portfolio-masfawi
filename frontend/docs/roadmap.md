@@ -120,17 +120,17 @@ Legenda status: `[x]` Selesai · `[/]` Sedang dikerjakan · `[ ]` Rencana · `[-
 
 ### Fase 7 — Master Data
 
-- [ ] `MasterKain` (CRUD inline, nonaktifkan bukan hapus)
-- [ ] `MasterCustomer` (CRUD inline, search debounce)
-- [ ] `useBuatKain`/`useUpdateKain`/`useUpdateCustomer`
+- [x] `MasterKain` (CRUD inline, nonaktifkan bukan hapus)
+- [x] `MasterCustomer` (CRUD inline, search debounce)
+- [x] `useBuatKain`/`useUpdateKain`/`useUpdateCustomer`
 
 ### Fase 8 — Arsip + Polish
 
-- [ ] `Arsip` (read-only DIAMBIL/BATAL, filter bulan)
-- [ ] Empty/loading/error state konsisten di semua halaman
-- [ ] `manualChunks` (pisahkan `lucide-react`, `@tanstack/react-query`) — hilangkan warning chunk >500 kB
-- [ ] Hapus `mulaiBerikutnya()` lama (klien-side, sudah diganti server-side)
-- [ ] Audit warna (tidak ada hex/oklch di luar `index.css`)
+- [x] `Arsip` (read-only DIAMBIL/BATAL, filter bulan)
+- [x] Empty/loading/error state konsisten di semua halaman
+- [x] `manualChunks` (pisahkan `lucide-react`, `@tanstack/react-query`) — hilangkan warning chunk >500 kB
+- [x] Hapus `mulaiBerikutnya()` lama (klien-side, sudah diganti server-side)
+- [x] Audit warna (tidak ada hex/oklch di luar `index.css`)
 
 ### Fase 9 — Demo Klien
 

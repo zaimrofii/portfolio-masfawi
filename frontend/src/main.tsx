@@ -7,7 +7,10 @@ import App from '@/App';
 import '@/styles/index.css';
 
 async function aktifkanMocking() {
-  if (!import.meta.env.DEV) return;
+  const pakaiMock =
+    import.meta.env.DEV || import.meta.env.VITE_USE_MOCK === 'true';
+
+  if (!pakaiMock) return;
 
   const { worker } = await import('@/mocks/browser');
   await worker.start({ onUnhandledFrame: 'bypass' });
